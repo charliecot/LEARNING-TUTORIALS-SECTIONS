@@ -1,0 +1,28 @@
+# =========================================================
+# BASIC DJANGO LEARNING REQUIREMENTS
+# Docker + Django + MySQL + PostgreSQL
+# Beginner-friendly setup for container learning
+# =========================================================
+
+# =========================================================
+# DJANGO CORE
+# =========================================================
+Django                  # Main Django framework
+
+# =========================================================
+# DATABASE SUPPORT
+# =========================================================
+
+# PostgreSQL
+psycopg                 # Modern PostgreSQL driver
+psycopg-binary          # Easier binary install
+
+# MySQL / MariaDB
+mysqlclient             # Primary MySQL driver
+PyMySQL                 # Alternative pure Python MySQL driver
+
+# =========================================================
+# DEVELOPMENT HELPERS
+# =========================================================
+python-decouple         # Environment variables (.env)
+Pillow                  # Image/File support

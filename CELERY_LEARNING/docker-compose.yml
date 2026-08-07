@@ -1,0 +1,138 @@
+services:
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis_server
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: redisinsight_server
+    ports:
+      - "5540:5540"
+    volumes:
+      - redisinsight_data:/data
+    depends_on:
+      - redis
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: postgres_server
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: Django_db
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_server
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+
+  django:
+    build:
+      context: ./DJANGO-CELERY-MASTERY
+    container_name: django_container
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./DJANGO-CELERY-MASTERY:/django
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=django-insecure-7_%6$7zwl3p3&4-460u+gb7g#(dopi7uzn14f)@b+++_&&u2ue
+      - ALLOWED_HOSTS=localhost,127.0.0.1
+
+      # PostgreSQL
+      - DB_NAME=Django_db
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_HOST=postgres
+      - DB_PORT=5432
+
+      # Celery
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+
+    depends_on:
+      - redis
+      - postgres
+
+  celery:
+    build:
+      context: ./DJANGO-CELERY-MASTERY
+    container_name: celery_worker
+    command: celery -A celerycore worker --loglevel=info
+    volumes:
+      - ./DJANGO-CELERY-MASTERY:/django
+
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=django-insecure-7_%6$7zwl3p3&4-460u+gb7g#(dopi7uzn14f)@b+++_&&u2ue
+      - ALLOWED_HOSTS=localhost,127.0.0.1
+
+      # PostgreSQL
+      - DB_NAME=Django_db
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_HOST=postgres
+      - DB_PORT=5432
+
+      # Celery
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+
+    depends_on:
+      - redis
+      - postgres
+
+  flower:
+    build:
+      context: ./DJANGO-CELERY-MASTERY
+    container_name: flower_server
+    command: celery -A celerycore flower --port=5555
+    volumes:
+      - ./DJANGO-CELERY-MASTERY:/django
+    ports:
+      - "5555:5555"
+
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=django-insecure-7_%6$7zwl3p3&4-460u+gb7g#(dopi7uzn14f)@b+++_&&u2ue
+      - ALLOWED_HOSTS=localhost,127.0.0.1
+
+      # PostgreSQL
+      - DB_NAME=Django_db
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_HOST=postgres
+      - DB_PORT=5432
+
+      # Celery
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+
+    depends_on:
+      - redis
+      - postgres
+      - celery
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+  redis_data:
+  redisinsight_data:

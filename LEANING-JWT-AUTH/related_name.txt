@@ -1,0 +1,37 @@
+# ForeignKey
+related_name="products"
+
+category.products.all()
+
+
+# OneToOne
+related_name="profile"
+
+user.profile
+
+
+# ManyToMany
+related_name="courses"
+
+student.courses.all()
+
+
+# Disable reverse relation
+related_name="+"
+
+
+
+Forward Relationship
+--------------------
+Product  ---------> Category
+
+product.category
+
+
+Reverse Relationship
+--------------------
+Category ---------> Products
+
+category.products.all()
+
+The name "products" comes from related_name.

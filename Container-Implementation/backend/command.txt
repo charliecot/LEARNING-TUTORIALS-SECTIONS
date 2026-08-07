@@ -1,0 +1,61 @@
+
+#PATH-1
+docker build --tag python-django .
+docker run --publish 8000:8000 python-django
+or 
+docker run --publish 8000:8000 --name python-django python-django
+
+for auto-rebuild
+docker run -p 8000:8000 -v %cd%:/app python-django
+
+#PATH-2
+
+docker-compose build
+docker-compose run --rm [app] django-admin startproject core .
+docker-compose up
+
+#PATH-3
+it used to 
+docker exec -it [name_of_container] /bin/bash
+or
+docker exec -it <container_name_or_id> /bin/sh
+docker compose build --no-cache --progress=plain [to resolve issues]
+
+to connect to your db
+docker exec -it mysql_container mysql -u user -p
+
+
+
+######################################################################
+db:                          # Name of the service/container inside docker-compose. Django will use this name as HOST (db).
+
+  image: postgres:16         # Pulls PostgreSQL version 16 from Docker Hub.
+
+  container_name: postgres_container   # Custom container name shown in `docker ps`.
+
+  restart: always            # Automatically restarts container if it stops or Docker restarts.
+
+  environment:               # Environment variables used to configure PostgreSQL on first startup.
+
+    POSTGRES_DB: mydb        # Creates a database named "mydb".
+
+    POSTGRES_USER: user      # Creates a PostgreSQL user named "user".
+
+    POSTGRES_PASSWORD: userpassword   # Password for that PostgreSQL user.
+
+  ports:                     # Maps ports between your PC and container.
+
+    - "5432:5432"           # Left side = your computer port, right side = container port.
+                             # You connect from your machine using localhost:5432.
+
+  volumes:                   # Persistent storage so database data remains after container stops.
+
+    - postgres_data:/var/lib/postgresql/data
+                             # postgres_data = Docker volume name
+                             # /var/lib/postgresql/data = PostgreSQL internal data folder
+
+
+volumes:                     # Declares Docker-managed storage volumes.
+
+  postgres_data:             # Creates the named volume for PostgreSQL data persistence.
+########################

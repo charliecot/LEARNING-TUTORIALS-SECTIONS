@@ -1,0 +1,169 @@
+[
+    {
+        "model": "custom_admin_app.course",
+        "pk": 1,
+        "fields": {
+            "name": "Python Programming",
+            "description": "Introduction to Python programming.",
+            "start_date": "2026-01-15",
+            "end_date": "2026-04-15",
+            "year": 2026,
+            "created_at": "2026-01-01T10:00:00Z",
+            "updated_at": "2026-01-01T10:00:00Z"
+        }
+    },
+    {
+        "model": "custom_admin_app.course",
+        "pk": 2,
+        "fields": {
+            "name": "Web Development",
+            "description": "Learn HTML, CSS, JavaScript and Django.",
+            "start_date": "2026-02-01",
+            "end_date": "2026-06-01",
+            "year": 2026,
+            "created_at": "2026-01-01T10:00:00Z",
+            "updated_at": "2026-01-01T10:00:00Z"
+        }
+    },
+    {
+        "model": "custom_admin_app.course",
+        "pk": 3,
+        "fields": {
+            "name": "Database Systems",
+            "description": "Relational database design and SQL.",
+            "start_date": "2026-03-01",
+            "end_date": "2026-07-01",
+            "year": 2026,
+            "created_at": "2026-01-01T10:00:00Z",
+            "updated_at": "2026-01-01T10:00:00Z"
+        }
+    },
+
+    {
+        "model": "custom_admin_app.person",
+        "pk": 1,
+        "fields": {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john@example.com",
+            "date_of_birth": "2000-05-20",
+            "created_at": "2026-01-01T10:00:00Z",
+            "updated_at": "2026-01-01T10:00:00Z"
+        }
+    },
+    {
+        "model": "custom_admin_app.person",
+        "pk": 2,
+        "fields": {
+            "first_name": "Jane",
+            "last_name": "Smith",
+            "email": "jane@example.com",
+            "date_of_birth": "1999-08-15",
+            "created_at": "2026-01-01T10:00:00Z",
+            "updated_at": "2026-01-01T10:00:00Z"
+        }
+    },
+    {
+        "model": "custom_admin_app.person",
+        "pk": 3,
+        "fields": {
+            "first_name": "Michael",
+            "last_name": "Johnson",
+            "email": "michael@example.com",
+            "date_of_birth": "2001-11-10",
+            "created_at": "2026-01-01T10:00:00Z",
+            "updated_at": "2026-01-01T10:00:00Z"
+        }
+    },
+    {
+        "model": "custom_admin_app.person",
+        "pk": 4,
+        "fields": {
+            "first_name": "Emily",
+            "last_name": "Brown",
+            "email": "emily@example.com",
+            "date_of_birth": "2002-03-05",
+            "created_at": "2026-01-01T10:00:00Z",
+            "updated_at": "2026-01-01T10:00:00Z"
+        }
+    },
+    {
+        "model": "custom_admin_app.person",
+        "pk": 5,
+        "fields": {
+            "first_name": "David",
+            "last_name": "Wilson",
+            "email": "david@example.com",
+            "date_of_birth": "1998-12-18",
+            "created_at": "2026-01-01T10:00:00Z",
+            "updated_at": "2026-01-01T10:00:00Z"
+        }
+    },
+
+    {
+        "model": "custom_admin_app.grade",
+        "pk": 1,
+        "fields": {
+            "course": 1,
+            "person": 1,
+            "grade": 92,
+            "created_at": "2026-01-01T10:00:00Z",
+            "updated_at": "2026-01-01T10:00:00Z"
+        }
+    },
+    {
+        "model": "custom_admin_app.grade",
+        "pk": 2,
+        "fields": {
+            "course": 1,
+            "person": 2,
+            "grade": 85,
+            "created_at": "2026-01-01T10:00:00Z",
+            "updated_at": "2026-01-01T10:00:00Z"
+        }
+    },
+    {
+        "model": "custom_admin_app.grade",
+        "pk": 3,
+        "fields": {
+            "course": 2,
+            "person": 3,
+            "grade": 78,
+            "created_at": "2026-01-01T10:00:00Z",
+            "updated_at": "2026-01-01T10:00:00Z"
+        }
+    },
+    {
+        "model": "custom_admin_app.grade",
+        "pk": 4,
+        "fields": {
+            "course": 2,
+            "person": 4,
+            "grade": 96,
+            "created_at": "2026-01-01T10:00:00Z",
+            "updated_at": "2026-01-01T10:00:00Z"
+        }
+    },
+    {
+        "model": "custom_admin_app.grade",
+        "pk": 5,
+        "fields": {
+            "course": 3,
+            "person": 5,
+            "grade": 88,
+            "created_at": "2026-01-01T10:00:00Z",
+            "updated_at": "2026-01-01T10:00:00Z"
+        }
+    },
+    {
+        "model": "custom_admin_app.grade",
+        "pk": 6,
+        "fields": {
+            "course": 3,
+            "person": 1,
+            "grade": 91,
+            "created_at": "2026-01-01T10:00:00Z",
+            "updated_at": "2026-01-01T10:00:00Z"
+        }
+    }
+]

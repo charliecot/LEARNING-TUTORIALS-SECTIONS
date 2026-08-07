@@ -1,0 +1,56 @@
+from django.contrib.auth import get_user_model
+from django.contrib.auth.backends import BaseBackend
+
+# 👇 Get the active User model (works even if you use custom user model)
+User = get_user_model()
+
+
+class EmailBackend(BaseBackend):
+    """
+    Custom authentication backend that allows users to login using EMAIL instead of username.
+    """
+
+    def authenticate(self, request, username=None, password=None, **kwargs):
+        """
+        This method is called by Django during login.
+        
+        Parameters:
+            username -> we will treat this as EMAIL
+            password -> raw password from user input
+        """
+
+        try:
+            # 🔍 Find user by email
+            user = User.objects.get(email=username)
+
+        except User.DoesNotExist:
+            # ❌ No user found with this email
+            return None
+
+        # 🔐 Check if password matches hashed password in database
+        if user.check_password(password):
+            # ✅ Authentication successful
+            return user
+
+        # ❌ Wrong password
+        return None
+
+    def get_user(self, user_id):
+        """
+        Django uses this to retrieve user object from user_id
+        (used in sessions, tokens, JWT workflows, etc.)
+        """
+
+        try:
+            # 🔍 Fetch user by primary key (ID)
+            return User.objects.get(pk=user_id)
+
+        except User.DoesNotExist:
+            # ❌ User no longer exists
+            return None
+
+
+put this line in your settings.py
+AUTHENTICATION_BACKENDS = [
+    'accounts.auth.EmailBackend',
+]

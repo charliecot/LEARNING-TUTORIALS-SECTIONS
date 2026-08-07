@@ -1,0 +1,187 @@
+
+A dedicated messaging system is a tool built only for sending, storing, 
+and delivering messages (tasks) between different parts of a system.
+RabbitMQ is a system whose ONLY job is to move tasks safely from one service to another.
+
+📬 Receives a task (message)
+🧾 Stores it in a queue
+🚦 Keeps it safe until a worker is ready
+📤 Sends it to Celery worker
+✔ Confirms delivery (acknowledgment)
+
+
+mean while 
+Redis (NOT dedicated messaging system)
+cache system first ⚡
+can also act as a broker
+multi-purpose tool
+
+
+AWSTemplateFormatVersion: "2010-09-09"
+
+Conditions:
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ """
+===============================
+ CELERY + DJANGO FULL SETUP
+===============================
+
+This file is NOT meant to be placed as one file in production.
+It is a COMPLETE COPY GUIDE showing ALL required parts.
+
+You will split it into correct Django files as indicated.
+"""
+
+# ==========================================================
+# 1. INSTALLATION (RUN IN TERMINAL)
+# ==========================================================
+"""
+pip install celery redis
+"""
+
+# ==========================================================
+# 2. PROJECT STRUCTURE (IMPORTANT)
+# ==========================================================
+"""
+config/
+    __init__.py   ← modify
+    settings.py   ← modify
+    celery.py     ← CREATE THIS FILE
+    urls.py
+    wsgi.py
+
+core/
+    tasks.py      ← CREATE THIS FILE
+"""
+
+# ==========================================================
+# 3. CELERY CONFIG FILE (config/celery.py)
+# ==========================================================
+"""
+CREATE FILE: config/celery.py
+"""
+
+from celery import Celery
+import os
+
+# Tell Celery where Django settings are
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+
+# Create Celery instance
+app = Celery('config')
+
+# Load config from Django settings (CELERY_ prefix)
+app.config_from_object('django.conf:settings', namespace='CELERY')
+
+# Auto-discover tasks from all apps
+app.autodiscover_tasks()
+
+
+# Optional test task (for debugging)
+@app.task(bind=True)
+def debug_task(self):
+    print(f"[CELERY DEBUG] Request: {self.request}")
+
+
+# ==========================================================
+# 4. DJANGO INIT FILE (config/__init__.py)
+# ==========================================================
+"""
+EDIT FILE: config/__init__.py
+This makes sure Celery starts with Django
+"""
+
+from .celery import app as celery_app
+
+__all__ = ('celery_app',)
+
+
+# ==========================================================
+# 5. DJANGO SETTINGS (config/settings.py)
+# ==========================================================
+"""
+ADD THIS TO settings.py
+"""
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Africa/Douala'
+
+
+# ==========================================================
+# 6. TASK FILE (core/tasks.py)
+# ==========================================================
+"""
+CREATE FILE: core/tasks.py
+"""
+
+from celery import shared_task
+import time
+
+# Simple async task
+@shared_task
+def add(x, y):
+    return x + y
+
+
+# Example slow task (background processing)
+@shared_task
+def slow_task():
+    time.sleep(10)
+    return "Task completed after delay"
+
+
+# ==========================================================
+# 7. USING CELERY IN VIEWS
+# ==========================================================
+"""
+Example: core/views.py
+"""
+
+from django.http import HttpResponse
+from core.tasks import add
+
+
+def test_celery(request):
+    # runs in background (ASYNC)
+    add.delay(10, 20)
+
+    return HttpResponse("Celery task sent!")
+
+
+# ==========================================================
+# 8. RUN CELERY WORKER (TERMINAL COMMAND)
+# ==========================================================
+"""
+celery -A config worker -l info
+"""
+
+# ==========================================================
+# 9. RUN REDIS (IMPORTANT)
+# ==========================================================
+"""
+Make sure Redis is running:
+
+Windows (if installed):
+redis-server
+
+OR Docker:
+docker run -p 6379:6379 redis
+"""
+
+# ==========================================================
+# 10. HOW IT WORKS (IMPORTANT CONCEPT)
+# ==========================================================
+"""
+Django sends task  ---> Redis (message broker) ---> Celery worker executes it
+"""

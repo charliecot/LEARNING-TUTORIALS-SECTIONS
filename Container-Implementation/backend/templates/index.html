@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Docker Compose</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7fb;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 24px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+        h1 {
+            margin-top: 0;
+            color: #1c3d5a;
+        }
+        p {
+            line-height: 1.75;
+        }
+        code {
+            display: block;
+            padding: 14px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            margin: 16px 0;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+        }
+        .highlight {
+            color: #0b6e99;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Docker Compose</h1>
+        <p>
+            This page introduces Docker Compose, a tool for defining and running multi-container Docker applications.
+            With Compose, you can describe your stack in a single <span class="highlight">docker-compose.yml</span> file and manage it with simple commands.
+        </p>
+        <h2>Quick Start</h2>
+        <p>
+            Create a <span class="highlight">docker-compose.yml</span> file in your project directory and define services, networks, and volumes.
+            Then run <strong>docker compose up</strong> to start your application.
+        </p>
+        <code>
+version: '3.9'
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+  app:
+    build: .
+    depends_on:
+      - db
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: appdb
+        </code>
+        <h2>Commands</h2>
+        <p>Common Docker Compose commands:</p>
+        <ul>
+            <li><strong>docker compose up</strong> - Build, (re)create, start, and attach to containers for a service.</li>
+            <li><strong>docker compose down</strong> - Stop and remove containers, networks, images, and volumes.</li>
+            <li><strong>docker compose logs</strong> - View output from containers.</li>
+        </ul>
+        <p>
+            Use Docker Compose to simplify development workflows, orchestrate services, and keep your container configuration in one place.
+        </p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,138 @@
+import axios from "axios";
+
+/*
+========================================================
+🌐 AXIOS API CLIENT
+- Central place for all API calls
+- Automatically used across your app
+========================================================
+*/
+const apiClient = axios.create({
+  baseURL: "http://localhost:8000", // Django backend URL
+
+  // 🔐 All requests are JSON by default
+  headers: {
+    "Content-Type": "application/json",
+  },
+
+  // ⏱ Prevent hanging requests
+  timeout: 10000,
+});
+
+export default apiClient;
+
+
+
+
+/*
+========================================================
+💾 SAVE TOKENS (after login)
+========================================================
+*/
+export const saveTokens = (accessToken, refreshToken) => {
+  localStorage.setItem("access_token", accessToken);
+  localStorage.setItem("refresh_token", refreshToken);
+};
+
+/*
+========================================================
+📤 GET TOKENS
+========================================================
+*/
+export const getAccessToken = () => {
+  return localStorage.getItem("access_token");
+};
+
+export const getRefreshToken = () => {
+  return localStorage.getItem("refresh_token");
+};
+
+/*
+========================================================
+🧹 CLEAR TOKENS (LOGOUT)
+========================================================
+*/
+export const clearTokens = () => {
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("refresh_token");
+};
+
+
+
+
+=======================================================
+INTERCEPTORS(request)AUTO ADD TOKEN
+=======================================================
+
+apiClient.interceptors.request.use(
+  (config) => {
+
+    // Get access token from storage
+    const accessToken = getAccessToken();
+
+    // If token exists, attach it to request
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+
+
+===========================================================
+INTERCEPTORS AUTO REFESHESH
+===========================================================
+
+apiClient.interceptors.response.use(
+  (response) => response,
+
+  async (error) => {
+
+    const originalRequest = error.config;
+
+    // If token expired (401 error)
+    if (error.response.status === 401 && !originalRequest._retry) {
+
+      originalRequest._retry = true;
+
+      // Get refresh token
+      const refreshToken = getRefreshToken();
+
+      try {
+        // Request new access token
+        const response = await axios.post(
+          "http://localhost:8000/api/token/refresh/",
+          {
+            refresh: refreshToken,
+          }
+        );
+
+        const newAccessToken = response.data.access;
+
+        // Save new access token
+        localStorage.setItem("access_token", newAccessToken);
+
+        // Update failed request with new token
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+
+        // Retry original request
+        return apiClient(originalRequest);
+
+      } catch (refreshError) {
+        // If refresh fails → logout user
+        clearTokens();
+        return Promise.reject(refreshError);
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+
+

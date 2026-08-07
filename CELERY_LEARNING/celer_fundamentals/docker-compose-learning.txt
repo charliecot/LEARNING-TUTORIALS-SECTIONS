@@ -1,0 +1,171 @@
+version: "3.9"
+
+services:
+
+  # =========================================================
+  # 🟢 1. DJANGO WEB APP
+  # =========================================================
+  web:
+    build: .
+    container_name: django_web
+
+    # Run Django development server
+    command: python manage.py runserver 0.0.0.0:8000
+
+    # Sync local code with container (live reload)
+    volumes:
+      - .:/app
+
+    ports:
+      - "8000:8000"
+
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+
+
+  # =========================================================
+  # 🟡 2. CELERY WORKER
+  # =========================================================
+  celery:
+    build: .
+    container_name: celery_worker
+
+    # Start Celery worker
+    command: celery -A config worker -l info
+
+    volumes:
+      - .:/app
+
+    depends_on:
+      - redis
+      - rabbitmq
+      - postgres
+
+
+  # =========================================================
+  # 🔵 3. REDIS (FAST CACHE + BROKER OPTION)
+  # =========================================================
+  redis:
+    image: redis:7-alpine
+    container_name: redis_server
+
+    ports:
+      - "6379:6379"
+
+    # Persistent storage (data survives restart)
+    volumes:
+      - redis_data:/data
+
+    command: ["redis-server", "--appendonly", "yes"]
+
+
+  # =========================================================
+  # 🧠 4. REDIS INSIGHT (GUI FOR REDIS)
+  # =========================================================
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: redis_insight
+
+    ports:
+      - "5540:5540"
+
+    depends_on:
+      - redis
+
+
+  # =========================================================
+  # 🐰 5. RABBITMQ (CELERY BROKER ALTERNATIVE)
+  # =========================================================
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq_server
+
+    ports:
+      - "5672:5672"     # messaging port (Celery uses this)
+      - "15672:15672"   # web UI
+
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+
+  # =========================================================
+  # 🐘 6. POSTGRESQL DATABASE
+  # =========================================================
+  postgres:
+    image: postgres:15
+    container_name: postgres_db
+
+    ports:
+      - "5432:5432"
+
+    environment:
+      POSTGRES_DB: app_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+
+  # =========================================================
+  # 🧭 7. PGADMIN (DATABASE GUI)
+  # =========================================================
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+
+    ports:
+      - "5050:80"
+
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+
+    depends_on:
+      - postgres
+
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+
+# =========================================================
+# 💾 VOLUMES (DATA PERSISTENCE)
+# =========================================================
+volumes:
+  postgres_data:
+  pgadmin_data:
+  redis_data:
+  rabbitmq_data:
+
+
+
+
+flower:
+  image: mher/flower
+  container_name: celery_flower
+
+  command: celery -A config flower --port=5555
+
+  ports:
+    - "5555:5555"
+
+  depends_on:
+    - redis
+    - rabbitmq
+
+
+
+
+| Service                     | URL                                                              |
+| --------------------------- | ---------------------------------------------------------------- |
+| **Django**                  | **[http://localhost:8000/](http://localhost:8000/)**             |
+| **Django Admin**            | **[http://localhost:8000/admin/](http://localhost:8000/admin/)** |
+| **Flower (Celery Monitor)** | **[http://localhost:5555/](http://localhost:5555/)**             |
+| **RedisInsight**            | **[http://localhost:5540/](http://localhost:5540/)**             |
+| **pgAdmin**                 | **[http://localhost:5050/](http://localhost:5050/)**             |

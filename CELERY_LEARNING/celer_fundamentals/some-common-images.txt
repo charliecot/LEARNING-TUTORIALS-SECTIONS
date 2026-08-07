@@ -1,0 +1,22 @@
+Service	Image 1	Image 2	Image 3	Image 4	Image 5	Recommended
+
+PostgreSQL:	postgres:17	,postgres:17-alpine,	postgres:16	,postgres:16-alpine	,bitnami/postgresql:latest,	postgres:17-alpine
+
+Redis:	redis:8,	redis:8-alpine,	redis:7,	redis:7-alpine,	bitnami/redis:latest,	redis:8-alpine,
+
+RabbitMQ:	rabbitmq:4	rabbitmq:4-management	rabbitmq:3	rabbitmq:3-management	bitnami/rabbitmq:latest	rabbitmq:4-management
+
+RedisInsight:	redis/redisinsight:latest,	redis/redisinsight:2.70,	redis/redisinsight:2.68	,redis/redisinsight:2.66,	redislabs/redisinsight:latest (legacy)	redis/redisinsight:latest
+
+Django (Python Base)	python:3.13-slim	python:3.12-slim	python:3.11-slim	python:3.13-alpine	python:3.12	python:3.13-slim
+
+Celery (Python Base)	python:3.13-slim	python:3.12-slim	python:3.11-slim	python:3.13-alpine	python:3.12	python:3.13-slimReact (Node.js Base)	node:24	node:24-alpine	node:22	node:22-alpine	node:lts-alpine	node:24-alpine
+
+Nginx	nginx:mainline	nginx:mainline-alpine	nginx:stable	nginx:stable-alpine	bitnami/nginx:latest	nginx:mainline-alpine
+
+pgAdmin	dpage/pgadmin4:latest	dpage/pgadmin4:9	dpage/pgadmin4:8	dpage/pgadmin4:7	dpage/pgadmin4:6	dpage/pgadmin4:latest
+
+Flower (Celery Monitoring)	mher/flower:latest	mher/flower:2.0	mher/flower:1.2	gregsi/latest-flower	quay.io/mher/flower	mher/flower:latest
+
+
+

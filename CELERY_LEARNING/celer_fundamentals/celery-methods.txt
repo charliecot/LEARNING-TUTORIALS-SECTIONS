@@ -1,0 +1,151 @@
+"""
+========================================
+ CELERY TASK METHODS CHEAT SHEET
+========================================
+
+This file is ONLY for learning.
+Shows how Celery methods work with comments.
+"""
+
+# ======================================================
+# 1. .delay()  (MOST SIMPLE & MOST USED)
+# ======================================================
+
+# Run task immediately in background
+# It sends task to Celery worker via broker (Redis/RabbitMQ)
+
+send_email.delay("user@gmail.com")
+
+"""
+Meaning:
+- Quick way to execute task asynchronously
+- No delay control
+
+Parameters:
+- *args → function arguments
+- **kwargs → keyword arguments
+"""
+
+
+# ======================================================
+# 2. .apply_async() (FULL CONTROL METHOD)
+# ======================================================
+
+send_email.apply_async(
+    args=["user@gmail.com"],   # positional arguments
+    kwargs={},                 # optional named arguments
+
+    countdown=10,              # wait 10 seconds before running
+    eta=None,                  # exact time to run task
+
+    queue="default"            # choose task queue
+)
+
+"""
+Meaning:
+- Advanced version of delay()
+- Gives full control over execution timing
+
+Parameters:
+- args → list of positional arguments
+- kwargs → dictionary of named arguments
+- countdown → delay execution by seconds
+- eta → run at specific datetime
+- queue → which Celery queue to use
+"""
+
+
+# ======================================================
+# 3. countdown (DELAY EXECUTION)
+# ======================================================
+
+send_email.apply_async(
+    args=["user@gmail.com"],
+    countdown=30   # run after 30 seconds
+)
+
+"""
+Meaning:
+- Delays task execution by N seconds
+"""
+
+
+# ======================================================
+# 4. eta (RUN AT EXACT TIME)
+# ======================================================
+
+from datetime import datetime, timedelta
+
+send_email.apply_async(
+    args=["user@gmail.com"],
+    eta=datetime.utcnow() + timedelta(minutes=5)
+)
+
+"""
+Meaning:
+- Runs task at exact scheduled time
+"""
+
+
+# ======================================================
+# 5. .get() (GET RESULT - BLOCKING)
+# ======================================================
+
+result = send_email.delay("user@gmail.com")
+
+print(result.get())
+
+"""
+Meaning:
+- Waits and returns task result
+
+WARNING:
+- Blocks execution (avoid in Django views)
+"""
+
+
+# ======================================================
+# 6. .ready() (CHECK IF TASK FINISHED)
+# ======================================================
+
+result = send_email.delay("user@gmail.com")
+
+print(result.ready())
+
+"""
+Meaning:
+- Returns True if task is completed
+- False if still running
+"""
+
+
+# ======================================================
+# 7. .state (TASK STATUS)
+# ======================================================
+
+result = send_email.delay("user@gmail.com")
+
+print(result.state)
+
+"""
+Possible states:
+- PENDING   → not started yet
+- STARTED   → running
+- SUCCESS   → completed successfully
+- FAILURE   → error occurred
+"""
+
+
+# ======================================================
+# SUMMARY (VERY IMPORTANT)
+# ======================================================
+
+"""
+.delay()         → simple background execution
+.apply_async()   → advanced execution control
+countdown        → delay in seconds
+eta              → run at exact time
+.get()           → get result (blocking)
+.ready()         → check completion
+.state           → check task status
+"""

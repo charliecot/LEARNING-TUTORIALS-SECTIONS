@@ -1,0 +1,46 @@
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+from django.contrib.auth.models import User
+from .models import Profile
+from .tasks import send_welcome_email
+
+
+# =========================================================
+# 1. CREATE PROFILE AFTER USER IS CREATED
+# =========================================================
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    """
+    Automatically create Profile when new User is created
+    """
+    if created:
+        Profile.objects.create(user=instance)
+
+
+# =========================================================
+# 2. SEND WELCOME EMAIL USING CELERY TASK
+# =========================================================
+
+@receiver(post_save, sender=User)
+def send_email_after_signup(sender, instance, created, **kwargs):
+    """
+    Calls Celery task AFTER user is created
+    """
+    if created:
+        send_welcome_email.delay(instance.email)
+
+
+# =========================================================
+# 3. DELETE RELATED PROFILE WHEN USER IS DELETED
+# =========================================================
+
+@receiver(post_delete, sender=User)
+def delete_related_profile(sender, instance, **kwargs):
+    """
+    Cleanup related data when user is deleted
+    """
+    try:
+        instance.profile.delete()
+    except Exception:
+        pass

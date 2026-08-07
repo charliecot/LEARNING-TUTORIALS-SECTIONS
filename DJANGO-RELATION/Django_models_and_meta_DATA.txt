@@ -1,0 +1,76 @@
+from django.db import models
+from django.utils.text import slugify
+
+
+class Product(models.Model):
+    # ==========================
+    # Fields
+    # ==========================
+    name = models.CharField(max_length=150)
+    slug = models.SlugField(max_length=170, unique=True, blank=True)
+    description = models.TextField(blank=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    stock = models.PositiveIntegerField(default=0)
+    sku = models.CharField(max_length=50, unique=True)
+    is_available = models.BooleanField(default=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    # ==========================
+    # Automatically create slug
+    # ==========================
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+
+        super().save(*args, **kwargs)
+
+    # ==========================
+    # String Representation
+    # ==========================
+    def __str__(self):
+        return self.name
+
+    # ==========================
+    # Meta Class
+    # ==========================
+    class Meta:
+        # Custom database table name
+        db_table = "products"
+
+        # Default ordering
+        ordering = ["-created_at"]
+
+        # Names shown in Django Admin
+        verbose_name = "Product"
+        verbose_name_plural = "Products"
+
+        # Database indexes
+        indexes = [
+            models.Index(fields=["name"]),
+            models.Index(fields=["slug"]),
+            models.Index(fields=["price"]),
+        ]
+
+        # Database constraints
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name", "sku"],
+                name="unique_product_name_sku"
+            )
+        ]
+
+        # Custom permissions
+        permissions = [
+            ("can_publish", "Can publish product"),
+            ("can_feature", "Can feature product"),
+        ]
+
+        # Default permissions Django creates
+        default_permissions = (
+            "add",
+            "change",
+            "delete",
+            "view",
+        )

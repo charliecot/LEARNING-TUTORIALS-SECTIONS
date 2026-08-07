@@ -1,0 +1,50 @@
+version (if used)
+
+services:
+
+    1. Database
+       - PostgreSQL
+
+    2. Cache
+       - Redis
+
+    3. Message Broker
+       - RabbitMQ
+
+    4. Backend
+       - Django
+
+    5. Background Workers
+       - Celery Worker
+       - Celery Beat (if you use scheduled tasks)
+
+    6. Frontend
+       - React
+
+    7. Management / Monitoring Tools
+       - RedisInsight
+       - (Optional) pgAdmin
+       - (Optional) Flower (for monitoring Celery)
+
+volumes:
+
+networks:
+
+
+project structure work flow
+
+
+project/
+│
+├── docker-compose.yml
+├── .env
+│
+├── backend/
+│   ├── Dockerfile
+│   └── Django project
+│
+├── frontend/
+│   ├── Dockerfile
+│   └── React project
+│
+└── nginx/        (optional)

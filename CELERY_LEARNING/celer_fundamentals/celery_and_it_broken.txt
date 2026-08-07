@@ -1,0 +1,67 @@
+# =========================
+# CELERY CONFIG (REDIS ONLY)
+# =========================
+
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+
+# optional but recommended
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Africa/Douala'
+
+
+
+# =========================
+# CELERY CONFIG (RABBITMQ ONLY)
+# =========================
+
+CELERY_BROKER_URL = 'amqp://admin:admin@rabbitmq:5672//'
+
+# result backend still needed
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+
+# optional configs
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Africa/Douala'
+
+
+# =========================
+# CELERY CONFIG (HYBRID)
+# =========================
+
+# 🐰 RabbitMQ handles task queue
+CELERY_BROKER_URL = 'amqp://admin:admin@rabbitmq:5672//'
+
+# ⚡ Redis stores task results
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+
+# serialization
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+# timezone
+CELERY_TIMEZONE = 'Africa/Douala'
+
+
+
+to view your broker(rabbitmq inside docker)  
+http://rabbitmq:15672   (inside Docker network)
+but if it inside your maching use
+http://localhost:15672
+
+
+to view celery using flower inside docker
+http://localhost:5555
+
+
+
+
+
+
+

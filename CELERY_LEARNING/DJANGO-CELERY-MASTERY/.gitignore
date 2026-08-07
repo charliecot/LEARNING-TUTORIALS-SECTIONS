@@ -1,0 +1,5 @@
+MyEnv/
+db.sqlite3
+.env
+.DS_Store
+__pychache__

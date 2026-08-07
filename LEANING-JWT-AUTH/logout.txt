@@ -1,0 +1,48 @@
+
+some settings in settings.py
+
+INSTALLED_APPS = [
+    ...
+    'rest_framework_simplejwt.token_blacklist',
+]
+
+you need to run this command
+python manage.py migrate
+
+
+
+SIMPLE_JWT = {
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+}
+
+
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+
+from rest_framework_simplejwt.tokens import RefreshToken
+
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def logout_view(request):
+    try:
+        refresh_token = request.data.get("refresh")
+
+        token = RefreshToken(refresh_token)
+        token.blacklist()   # 🚫 invalidate token
+
+        return Response(
+            {"detail": "Logout successful"},
+            status=status.HTTP_200_OK
+        )
+
+    except Exception:
+        return Response(
+            {"detail": "Invalid token"},
+            status=status.HTTP_400_BAD_REQUEST
+        )

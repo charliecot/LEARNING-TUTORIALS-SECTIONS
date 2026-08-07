@@ -1,0 +1,12 @@
+services:
+  app:
+    build:
+      context: .
+    volumes:
+      - .:/core
+      - /core/node_modules
+    ports:
+      - "5173:5173"
+    image: app:react
+    container_name: react_container
+    command: npm run dev -- --host 0.0.0.0

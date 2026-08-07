@@ -1,0 +1,12 @@
+name = models.CharField(
+    max_length=100,
+
+    null=False,          # Database cannot store NULL
+    blank=False,         # Field is required in forms
+    unique=True,         # No duplicate values
+    default="",          # Default value
+    db_index=True,       # Creates a database index
+    editable=True,       # Editable in forms/admin
+    help_text="Enter product name.",
+    verbose_name="Product Name"
+)

@@ -1,0 +1,50 @@
+1. Django Jazzmin
+   pip install django-jazzmin
+
+2. Django Grappelli
+   pip install django-grappelli
+
+3. Django Jet
+   pip install django-jet
+
+4. Django Material Admin
+   pip install django-material-admin
+
+5. Django Admin Interface
+   pip install django-admin-interface
+
+6. Django Unfold
+   pip install django-unfold
+
+7. Django Lucus
+   pip install django-lucus
+
+8. Django Admin List Filter Dropdown
+   pip install django-admin-list-filter-dropdown
+
+9. Django Admin Range Filter
+   pip install django-admin-rangefilter
+
+
+Admin LABRARIES AND THIER UTILITES TOOLS PAIR
+
+PAIR 1 (BEST MODERN STACK)
+django-unfold
+django-admin-rangefilter
+django-admin-list-filter-dropdown
+
+PAIR 2 (BEGINNER + STABLE PRODUCTION)
+django-jazzmin
+django-admin-rangefilter
+
+PAIR 3 (CUSTOM BRANDING STYLE)
+django-admin-interface
+django-admin-rangefilter
+
+PAIR 4 (CLASSIC OLD STYLE)
+django-grappelli
+django-admin-list-filter-dropdown
+
+PAIR 4 (CLASSIC OLD STYLE)
+django-grappelli
+django-admin-list-filter-dropdown

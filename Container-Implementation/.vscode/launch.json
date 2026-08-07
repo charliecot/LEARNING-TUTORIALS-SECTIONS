@@ -1,0 +1,32 @@
+{
+    "configurations": [
+        {
+            "name": "Python: Django (local)",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/backend/manage.py",
+            "args": [
+                "runserver",
+                "8000"
+            ],
+            "django": true,
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/backend"
+        },
+        {
+            "name": "Docker: Django (container)",
+            "type": "docker",
+            "request": "launch",
+            "preLaunchTask": "docker-run: debug",
+            "python": {
+                "pathMappings": [
+                    {
+                        "localRoot": "${workspaceFolder}/backend",
+                        "remoteRoot": "/django"
+                    }
+                ],
+                "projectType": "general"
+            }
+        }
+    ]
+}

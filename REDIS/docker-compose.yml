@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+  # =========================
+  # Redis Server
+  # =========================
+  redis:
+    image: redis:7-alpine
+    container_name: redis-server
+
+    # Expose Redis port to your machine
+    ports:
+      - "6379:6379"
+
+    # Persist Redis data (so it doesn't disappear when container stops)
+    volumes:
+      - redis_data:/data
+
+    # Optional: restart automatically if container crashes
+    restart: always
+
+    # Enable Redis persistence (AOF = Append Only File)
+    command: ["redis-server", "--appendonly", "yes"]
+
+
+  # =========================
+  # RedisInsight (GUI tool)
+  # =========================
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: redis-insight
+
+    # Web UI port
+    ports:
+      - "5540:5540"
+
+    # Depends on Redis (starts Redis first)
+    depends_on:
+      - redis
+
+    restart: always
+
+
+# =========================
+# Named volumes
+# =========================
+volumes:
+  redis_data:
+    driver: local

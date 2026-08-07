@@ -1,0 +1,370 @@
+"""
+====================================================================
+                GOOGLE LOGIN + JWT (DJANGO REST FRAMEWORK)
+====================================================================
+
+PROJECT STRUCTURE
+
+accounts/
+│
+├── utils.py          <-- Verify Google token
+├── views.py          <-- Google Login API
+├── urls.py           <-- URL endpoint
+│
+config/
+│
+├── settings.py       <-- Google Client ID
+
+====================================================================
+STEP 1
+====================================================================
+
+Install packages
+
+pip install google-auth
+pip install djangorestframework-simplejwt
+
+
+====================================================================
+STEP 2
+====================================================================
+FILE:
+config/settings.py
+
+Add your Google Client ID.
+
+"""
+
+GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+
+
+
+
+"""
+====================================================================
+STEP 3
+====================================================================
+FILE:
+accounts/utils.py
+
+This file verifies the Google ID Token.
+
+"""
+
+from google.oauth2 import id_token
+from google.auth.transport import requests
+from django.contrib.auth import get_user_model
+from django.conf import settings
+
+User = get_user_model()
+
+
+def verify_google_token(token):
+    """
+    Verify Google ID Token.
+
+    Flow
+
+    Frontend
+        ↓
+    Google returns ID Token
+        ↓
+    Django verifies token with Google
+        ↓
+    Get user's email
+        ↓
+    Find or create user
+        ↓
+    Return User object
+    """
+
+    try:
+
+        # Verify token with Google's servers
+        google_user = id_token.verify_oauth2_token(
+            token,
+            requests.Request(),
+            settings.GOOGLE_CLIENT_ID
+        )
+
+        # Get user email
+        email = google_user.get("email")
+
+        if not email:
+            return None
+
+        # Optional information returned by Google
+        first_name = google_user.get("given_name", "")
+        last_name = google_user.get("family_name", "")
+
+        # Create user if they don't already exist
+        user, created = User.objects.get_or_create(
+            email=email,
+            defaults={
+                "first_name": first_name,
+                "last_name": last_name,
+            }
+        )
+
+        return user
+
+    except Exception:
+        return None
+
+
+
+
+"""
+====================================================================
+STEP 4
+====================================================================
+FILE:
+accounts/views.py
+
+Google Login API
+
+"""
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from .utils import verify_google_token
+
+
+@api_view(["POST"])
+def google_login(request):
+
+    """
+    API Request
+
+    POST /api/auth/google/
+
+    {
+        "token":"GOOGLE_ID_TOKEN"
+    }
+    """
+
+    # Read token sent from frontend
+    google_token = request.data.get("token")
+
+    # Token missing
+    if not google_token:
+        return Response(
+            {
+                "status": "error",
+                "message": "Google token is required",
+                "data": None
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # Verify token
+    user = verify_google_token(google_token)
+
+    # Invalid Google token
+    if user is None:
+        return Response(
+            {
+                "status": "error",
+                "message": "Invalid Google token",
+                "data": None
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # Generate JWT tokens
+    refresh = RefreshToken.for_user(user)
+
+    access_token = str(refresh.access_token)
+    refresh_token = str(refresh)
+
+    return Response(
+        {
+            "status": "success",
+            "message": "Login successful",
+
+            "data": {
+
+                "access": access_token,
+
+                "refresh": refresh_token,
+
+                "user": {
+
+                    "id": user.id,
+
+                    "email": user.email,
+
+                    "first_name": user.first_name,
+
+                    "last_name": user.last_name,
+                }
+
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+
+
+
+"""
+====================================================================
+STEP 5
+====================================================================
+FILE:
+accounts/urls.py
+
+"""
+
+from django.urls import path
+
+from .views import google_login
+
+urlpatterns = [
+
+    path(
+        "auth/google/",
+        google_login,
+        name="google-login"
+    ),
+
+]
+
+
+
+"""
+====================================================================
+STEP 6
+====================================================================
+PROJECT urls.py
+
+Include your app URLs.
+
+"""
+
+from django.urls import path, include
+
+urlpatterns = [
+
+    path("api/", include("accounts.urls")),
+
+]
+
+
+
+
+"""
+====================================================================
+FRONTEND FLOW
+====================================================================
+
+User clicks
+
+Login With Google
+
+        ↓
+
+Google popup opens
+
+        ↓
+
+User signs in
+
+        ↓
+
+Google returns an ID Token
+
+        ↓
+
+Frontend sends
+
+POST /api/auth/google/
+
+{
+    "token":"GOOGLE_ID_TOKEN"
+}
+
+        ↓
+
+Backend verifies token
+
+        ↓
+
+Creates user if needed
+
+        ↓
+
+Creates JWT
+
+        ↓
+
+Returns
+
+Access Token
+Refresh Token
+
+====================================================================
+
+
+
+SUCCESS RESPONSE
+
+{
+    "status":"success",
+    "message":"Login successful",
+    "data":{
+
+        "access":".....",
+
+        "refresh":".....",
+
+        "user":{
+
+            "id":1,
+
+            "email":"john@gmail.com",
+
+            "first_name":"John",
+
+            "last_name":"Doe"
+
+        }
+
+    }
+}
+
+
+
+ERROR RESPONSE
+
+{
+    "status":"error",
+    "message":"Invalid Google token",
+    "data":null
+}
+
+====================================================================
+
+MENTAL MODEL
+
+Google
+    │
+    │ proves the user's identity
+    ▼
+Django
+    │
+    │ verifies Google token
+    ▼
+Find/Create User
+    │
+    ▼
+Generate JWT
+    │
+    ▼
+Return access + refresh tokens
+
+====================================================================

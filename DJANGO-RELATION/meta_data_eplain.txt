@@ -1,0 +1,128 @@
+class Meta:
+
+    # -----------------------------
+    # Custom database table name
+    # -----------------------------
+    # By default Django would create a table named:
+    # app_name_product
+    #
+    # This changes the table name to:
+    # products
+    db_table = "products"
+
+
+    # -----------------------------
+    # Default ordering
+    # -----------------------------
+    # Every time you query Product.objects.all(),
+    # Django automatically sorts the results by
+    # created_at in descending order (newest first).
+    #
+    # "-" means descending.
+    # Without "-" it would be ascending (oldest first).
+    ordering = ["-created_at"]
+
+
+    # -----------------------------
+    # Singular name in Django Admin
+    # -----------------------------
+    # Instead of showing "Products",
+    # Django knows the singular name is "Product".
+    verbose_name = "Product"
+
+
+    # -----------------------------
+    # Plural name in Django Admin
+    # -----------------------------
+    # This is the name shown in the admin sidebar.
+    verbose_name_plural = "Products"
+
+
+    # -----------------------------
+    # Database Indexes
+    # -----------------------------
+    # Indexes make searching much faster.
+    #
+    # Example:
+    # Product.objects.filter(name="Laptop")
+    #
+    # Instead of checking every row one by one,
+    # the database uses the index to find results quickly.
+    #
+    # Think of an index like the index at the back
+    # of a textbook—you go directly to the page
+    # instead of reading the whole book.
+    indexes = [
+        models.Index(fields=["name"]),
+        models.Index(fields=["slug"]),
+        models.Index(fields=["price"]),
+    ]
+
+
+    # -----------------------------
+    # Database Constraints
+    # -----------------------------
+    # Constraints enforce rules at the database level.
+    #
+    # This UniqueConstraint means that the combination
+    # of name and sku must be unique.
+    #
+    # VALID
+    # -----------------
+    # Laptop   SKU001
+    # Laptop   SKU002
+    #
+    # INVALID
+    # -----------------
+    # Laptop   SKU001
+    # Laptop   SKU001   ❌ Duplicate combination
+    #
+    # The "name" parameter is simply the name given
+    # to this database constraint.
+    constraints = [
+        models.UniqueConstraint(
+            fields=["name", "sku"],
+            name="unique_product_name_sku"
+        )
+    ]
+
+
+    # -----------------------------
+    # Custom Permissions
+    # -----------------------------
+    # Django will create these extra permissions.
+    #
+    # You can assign them to users or groups.
+    #
+    # Example:
+    # Can Publish Product
+    # Can Feature Product
+    #
+    # Later you can check:
+    #
+    # request.user.has_perm("shop.can_publish")
+    permissions = [
+        ("can_publish", "Can publish product"),
+        ("can_feature", "Can feature product"),
+    ]
+
+
+    # -----------------------------
+    # Default Permissions
+    # -----------------------------
+    # Django automatically creates these permissions
+    # for every model.
+    #
+    # add     -> Can create a product
+    # change  -> Can edit a product
+    # delete  -> Can delete a product
+    # view    -> Can view a product
+    #
+    # These appear in Django Admin and are used by
+    # Django's permission system.
+    default_permissions = (
+        "add",
+        "change",
+        "delete",
+        "view",
+    )
